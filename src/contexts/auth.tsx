@@ -1,14 +1,14 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import AsyncStorage from '@react-native-community/async-storage';
+import { Alert } from 'react-native';
 import { parseISO, addHours, isAfter } from 'date-fns';
 
-import { Alert } from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
 import * as auth from '../services/auth';
 import api from '../services/api';
 
 interface IToken {
   accessToken: string;
-  accessTokenExpirationDate: string;
+  expirationDate: string;
   refreshToken: string;
 }
 
@@ -29,34 +29,35 @@ export const AuthProvider: React.FC = ({ children }) => {
   async function handleAccessTokenWithRefreshToken(
     refreshToken: string
   ): Promise<void> {
+    setLoading(true);
     const response = await auth.handleNewAccessToken(refreshToken);
     if (response) {
+      const expirationDate = addHours(new Date(), 2).toISOString();
+
       await AsyncStorage.setItem('@SPGAuth:accessToken', response.accessToken);
+      await AsyncStorage.setItem('@SPG:refreshToken', response.refreshToken);
+      await AsyncStorage.setItem('@SPG:expirationDate', expirationDate);
     }
+    setLoading(false);
   }
 
   useEffect(() => {
     async function loadStorageData() {
-      const storageAccessToken = await AsyncStorage.getItem('@SPG:accessToken');
-      const storageRefreshToken = await AsyncStorage.getItem(
-        '@SPG:refreshToken'
-      );
-      const storageTokenExpirationDate = await AsyncStorage.getItem(
-        '@SPG:accessTokenExpirationDate'
-      );
+      const accessToken = await AsyncStorage.getItem('@SPG:accessToken');
+      const refreshToken = await AsyncStorage.getItem('@SPG:refreshToken');
+      const expirationDate = await AsyncStorage.getItem('@SPG:expirationDate');
 
-      if (
-        storageAccessToken &&
-        storageRefreshToken &&
-        storageTokenExpirationDate
-      ) {
+      if (accessToken && refreshToken && expirationDate) {
+        setLoading(true);
         const currentTime = addHours(new Date(), 1);
-        const lastValidTime = addHours(parseISO(storageTokenExpirationDate), 1);
+        const lastValidTime = addHours(parseISO(expirationDate), 1);
 
-        if (!isAfter(currentTime, lastValidTime)) {
-          handleAccessTokenWithRefreshToken(storageRefreshToken);
+        setToken({ accessToken, refreshToken, expirationDate });
+
+        if (isAfter(currentTime, lastValidTime)) {
+          handleAccessTokenWithRefreshToken(refreshToken);
         }
-        api.defaults.headers.Authorization = `Bearer ${storageAccessToken}`;
+        api.defaults.headers.Authorization = `Bearer ${accessToken}`;
         setLoading(false);
       }
     }
@@ -67,18 +68,14 @@ export const AuthProvider: React.FC = ({ children }) => {
   async function handleAccessToken() {
     setLoading(true);
     const response = await auth.authorization();
-    console.log(response);
-    if (response.accessToken) {
-      const { accessToken, refreshToken, accessTokenExpirationDate } = response;
+    if (response && response.accessToken) {
+      const { accessToken, refreshToken, expirationDate } = response;
 
       api.defaults.headers.Authorization = `Bearer ${accessToken}`;
 
       await AsyncStorage.setItem('@SPG:accessToken', accessToken);
       await AsyncStorage.setItem('@SPG:refreshToken', refreshToken);
-      await AsyncStorage.setItem(
-        '@SPG:accessTokenExpirationDate',
-        accessTokenExpirationDate
-      );
+      await AsyncStorage.setItem('@SPG:expirationDate', expirationDate);
       setLoading(false);
       return setToken(response);
     }

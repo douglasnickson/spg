@@ -3,18 +3,19 @@ import api from '../services/api';
 
 interface IAccessToken {
   accessToken: string;
-  accessTokenExpirationDate: string;
+  expirationDate: string;
   refreshToken: string;
 }
 
 interface INewAccessToken {
   accessToken: string;
+  refreshToken: string;
   tokenType: string;
   scope: string;
   expiresIn: number;
 }
 
-export async function authorization(): Promise<IAccessToken> {
+export async function authorization(): Promise<IAccessToken | undefined> {
   const config = {
     serviceConfiguration: {
       authorizationEndpoint: 'https://accounts.spotify.com/authorize',
@@ -43,24 +44,23 @@ export async function authorization(): Promise<IAccessToken> {
     const { accessToken, accessTokenExpirationDate, refreshToken } = response;
     return {
       accessToken,
-      accessTokenExpirationDate,
+      expirationDate: accessTokenExpirationDate,
       refreshToken,
     };
   } catch (error) {
-    return error;
+    console.error(error);
   }
 }
 
 export async function handleNewAccessToken(
   refreshToken: string
-): Promise<INewAccessToken> {
+): Promise<INewAccessToken | undefined> {
   const url = 'https://accounts.spotify.com/api/token';
 
   const params = new URLSearchParams();
   params.append('grant_type', 'refresh_token');
   params.append('refresh_token', refreshToken);
-
-  const data = { params };
+  params.append('client_id', 'f2088127db604e0086b00450e8d0197b');
 
   const headers = {
     headers: {
@@ -71,11 +71,22 @@ export async function handleNewAccessToken(
   };
 
   try {
-    const response = await api.post(url, data, headers);
-    console.log(response);
-    const [accessToken, tokenType, scope, expiresIn] = response.data;
-    return { accessToken, tokenType, scope, expiresIn };
+    const response = await api.post(url, params, headers);
+    const {
+      access_token,
+      refresh_token,
+      token_type,
+      scope,
+      expires_in,
+    } = response.data;
+    return {
+      accessToken: access_token,
+      refreshToken: refresh_token,
+      tokenType: token_type,
+      scope: scope,
+      expiresIn: expires_in,
+    };
   } catch (e) {
-    return e;
+    console.error(e);
   }
 }
