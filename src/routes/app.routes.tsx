@@ -5,6 +5,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Dashboard from '../pages/Dashboard';
+import Playlists from '../pages/Playlists';
+import Configuration from '../pages/Configuration';
 
 const Tabs = createBottomTabNavigator();
 const HomeStack = createStackNavigator();
@@ -22,7 +24,7 @@ const HomeStackScreen = () => (
         fontWeight: 'bold',
       },
     }}>
-    <HomeStack.Screen name="Home" component={Dashboard} />
+    <HomeStack.Screen name="Criar Playlist" component={Dashboard} />
   </HomeStack.Navigator>
 );
 
@@ -37,7 +39,7 @@ const PlaylistStackScreen = () => (
         fontWeight: 'bold',
       },
     }}>
-    <PlaylistStack.Screen name="Playlist" component={Dashboard} />
+    <PlaylistStack.Screen name="Minhas Playlists" component={Playlists} />
   </PlaylistStack.Navigator>
 );
 
@@ -52,7 +54,7 @@ const SettingsStackScreen = () => (
         fontWeight: 'bold',
       },
     }}>
-    <SettingsStack.Screen name="Settings" component={Dashboard} />
+    <SettingsStack.Screen name="Configurações" component={Configuration} />
   </SettingsStack.Navigator>
 );
 
