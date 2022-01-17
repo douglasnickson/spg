@@ -18,6 +18,15 @@ interface IAuthContextData {
   loading: boolean;
   handleAccessToken(): Promise<void>;
   signOut(): void;
+  currentPlaylist: IPlaylist | null;
+  handlePlaylist(playlist: IPlaylist | null): void;
+}
+
+interface IPlaylist {
+  data: {
+    id: string;
+    name: string;
+  };
 }
 
 const AuthContext = createContext<IAuthContextData>({} as IAuthContextData);
@@ -25,6 +34,7 @@ const AuthContext = createContext<IAuthContextData>({} as IAuthContextData);
 export const AuthProvider: React.FC = ({ children }) => {
   const [token, setToken] = useState<IToken | null>(null);
   const [loading, setLoading] = useState(false);
+  const [currentPlaylist, setCurrentPlaylist] = useState<any>(null);
 
   async function handleAccessTokenWithRefreshToken(
     refreshToken: string
@@ -91,6 +101,10 @@ export const AuthProvider: React.FC = ({ children }) => {
     });
   }
 
+  function handlePlaylist(playlist: any) {
+    setCurrentPlaylist(playlist);
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -99,6 +113,8 @@ export const AuthProvider: React.FC = ({ children }) => {
         loading,
         handleAccessToken,
         signOut,
+        currentPlaylist,
+        handlePlaylist,
       }}>
       {children}
     </AuthContext.Provider>

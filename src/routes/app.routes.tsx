@@ -13,7 +13,7 @@ const HomeStack = createStackNavigator();
 const PlaylistStack = createStackNavigator();
 const SettingsStack = createStackNavigator();
 
-const HomeStackScreen = () => (
+const HomeStackScreen = ({ route }) => (
   <HomeStack.Navigator
     screenOptions={{
       headerStyle: {

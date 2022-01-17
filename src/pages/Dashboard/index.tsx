@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Picker } from '@react-native-picker/picker';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
 import {
   TouchableOpacity,
   Switch,
   ScrollView,
   Modal,
   FlatList,
+  StyleSheet,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import {
   Container,
@@ -27,6 +29,19 @@ import {
 import logo from '../../assets/logo.png';
 import Button from '../../components/Button';
 
+import { useAuth } from '../../contexts/auth';
+
+interface IPlaylist {
+  data: {
+    id: string;
+    name: string;
+  };
+}
+
+interface IFlatlistItem {
+  item: string;
+}
+
 const Dashboard: React.FC = () => {
   const [showCategory, setShowCategory] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -39,6 +54,9 @@ const Dashboard: React.FC = () => {
   const [title, setTitle] = useState('');
   const [collaborative, setCollaborative] = useState(false);
   const [isPublic, setIsPublic] = useState(true);
+  const [playlist, setPlaylist] = useState<IPlaylist | null>(null);
+
+  const { currentPlaylist } = useAuth();
 
   const handleCategory = (value: any) => {
     if (value) {
@@ -85,18 +103,25 @@ const Dashboard: React.FC = () => {
     setCollaborative(false);
     setIsPublic(true);
     setGenre('unknown');
+    setPlaylist(null);
   };
 
-  const Item = ({ title }) => (
+  const Item = ({ item }: IFlatlistItem) => (
     <ListContainer>
-      <TextList>{title}</TextList>
+      <TextList>{item}</TextList>
     </ListContainer>
   );
 
-  const renderItem = ({ item }) => <Item title={item} />;
+  const renderItem = ({ item }: IFlatlistItem) => <Item item={item} />;
+
+  useEffect(() => {
+    if (currentPlaylist) {
+      setPlaylist(currentPlaylist);
+    }
+  }, [currentPlaylist]);
 
   return (
-    <ScrollView style={{ marginBottom: 50, backgroundColor: '#272727' }}>
+    <ScrollView style={styles.scrollViewStyle}>
       <Container>
         <Modal
           animationType="slide"
@@ -115,6 +140,17 @@ const Dashboard: React.FC = () => {
           </Container>
         </Modal>
         <Image source={logo} />
+
+        {playlist && (
+          <TextInputContainer>
+            <CustomTextInput
+              onChangeText={setTitle}
+              value={'Playlist: ' + playlist.data.name}
+              editable={false}
+              style={styles.placeholderStyle}
+            />
+          </TextInputContainer>
+        )}
         {showCategory && (
           <>
             <PickerContainer>
@@ -125,7 +161,7 @@ const Dashboard: React.FC = () => {
                 <Picker.Item
                   label="Selecione o tipo de playlist"
                   value="unknown"
-                  style={{ color: '#a7a7a7' }}
+                  style={styles.placeholderStyle}
                 />
                 <Picker.Item label="Banda/Artistas" value="artista" />
                 <Picker.Item label="Gênero Musical" value="genero" />
@@ -141,7 +177,9 @@ const Dashboard: React.FC = () => {
                 value={artist}
                 placeholder="Informe a banda/artista"
               />
-              <TouchableOpacity style={{ marginEnd: 5 }} onPress={handleArtist}>
+              <TouchableOpacity
+                style={styles.btAddArtist}
+                onPress={handleArtist}>
                 <Ionicons name={'add-circle'} size={32} color={'#1ed760'} />
               </TouchableOpacity>
             </TextInputContainer>
@@ -157,7 +195,7 @@ const Dashboard: React.FC = () => {
                 <Picker.Item
                   label="Selecione uma opção"
                   value="unknown"
-                  style={{ color: '#a7a7a7' }}
+                  style={styles.placeholderStyle}
                 />
                 <Picker.Item label="Rock" value="rock" />
                 <Picker.Item label="Blues" value="blues" />
@@ -210,7 +248,7 @@ const Dashboard: React.FC = () => {
         </SwitchContainer>
         {artists && artists.length > 0 && (
           <TouchableOpacity
-            style={{ marginTop: 8, marginEnd: 5, marginBottom: 8 }}
+            style={styles.btListArtist}
             onPress={openCloseModal}>
             <Ionicons name={'information-circle'} size={32} color={'#1ed760'} />
           </TouchableOpacity>
@@ -221,5 +259,26 @@ const Dashboard: React.FC = () => {
     </ScrollView>
   );
 };
+
+const styles = StyleSheet.create({
+  scrollViewStyle: {
+    marginBottom: 50,
+    backgroundColor: '#272727',
+  },
+
+  btListArtist: {
+    marginTop: 8,
+    marginEnd: 5,
+    marginBottom: 8,
+  },
+
+  btAddArtist: {
+    marginEnd: 5,
+  },
+
+  placeholderStyle: {
+    color: '#a7a7a7',
+  },
+});
 
 export default Dashboard;
