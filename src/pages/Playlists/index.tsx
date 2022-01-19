@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FlatList, TouchableOpacity } from 'react-native';
 
 import {
@@ -12,6 +12,8 @@ import {
 } from './styles';
 
 import { useAuth } from '../../contexts/auth';
+import { IPlaylist } from 'src/model/IPlaylist';
+import { getPlaylists, getUserProfile } from '../../services/spotify';
 
 const playlists = [
   {
@@ -40,10 +42,10 @@ interface IFlatlistRender {
     id: string;
     name: string;
   };
-  onPress(data: IPlaylist): void;
+  onPress(data: IFlatlistPlaylist): void;
 }
 
-interface IPlaylist {
+interface IFlatlistPlaylist {
   id: string;
   name: string;
 }
@@ -54,6 +56,7 @@ interface Props {
 
 const Playlist: React.FC<Props> = ({ navigation }: Props) => {
   const { handlePlaylist } = useAuth();
+  const [data, setData] = useState<IPlaylist[]>([]);
 
   const Item = ({ item, onPress }: IFlatlistRender) => (
     <TouchableOpacity onPress={() => onPress(item)}>
@@ -76,17 +79,26 @@ const Playlist: React.FC<Props> = ({ navigation }: Props) => {
     <Item item={item} onPress={goToHome} />
   );
 
-  const goToHome = (item: IPlaylist) => {
+  const goToHome = (item: IFlatlistPlaylist) => {
     const { id, name } = item;
     handlePlaylist({ data: { id, name } });
     navigation.navigate('HomeTab');
   };
 
+  useEffect(() => {
+    const getUserPlaylists = async () => {
+      const user = await getUserProfile();
+      const userPlaylists = await getPlaylists(user.id);
+      setData(userPlaylists);
+    };
+    getUserPlaylists();
+  }, []);
+
   return (
     <Container>
       <SafeAreaViewContainer>
         <FlatList
-          data={playlists}
+          data={data}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
         />

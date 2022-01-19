@@ -72,13 +72,8 @@ export async function handleNewAccessToken(
 
   try {
     const response = await api.post(url, params, headers);
-    const {
-      access_token,
-      refresh_token,
-      token_type,
-      scope,
-      expires_in,
-    } = response.data;
+    const { access_token, refresh_token, token_type, scope, expires_in } =
+      response.data;
     return {
       accessToken: access_token,
       refreshToken: refresh_token,
