@@ -13,6 +13,7 @@ export const SafeAreaViewContainer = styled.SafeAreaView`
   justify-content: center;
   align-items: center;
   margin-top: 12px;
+  margin-bottom: 55px;
 `;
 
 export const ItemContainer = styled.View`
@@ -47,4 +48,14 @@ export const ItemDescription = styled.Text`
   margin-left: 8px;
   margin-top: 2px;
   font-size: 12px;
+`;
+
+export const MsgText = styled.Text`
+  font-size: 14px;
+  color: #fff;
+  margin: 8px 5px 8px 5px;
+  text-align: center;
+  border: 1px solid #ccc;
+  padding: 8px;
+  border-radius: 8px;
 `;

@@ -18,5 +18,5 @@ export interface IPlaylist {
   description: string;
   href: string;
   images: IImage[];
-  tracks: ITrack[];
+  tracks: ITrack;
 }

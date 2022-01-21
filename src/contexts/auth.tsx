@@ -5,12 +5,7 @@ import { parseISO, addHours, isAfter } from 'date-fns';
 
 import * as auth from '../services/auth';
 import api from '../services/api';
-
-interface IToken {
-  accessToken: string;
-  expirationDate: string;
-  refreshToken: string;
-}
+import { IToken } from 'src/model/IToken';
 
 interface IAuthContextData {
   signed: boolean;
@@ -47,6 +42,8 @@ export const AuthProvider: React.FC = ({ children }) => {
       await AsyncStorage.setItem('@SPGAuth:accessToken', response.accessToken);
       await AsyncStorage.setItem('@SPG:refreshToken', response.refreshToken);
       await AsyncStorage.setItem('@SPG:expirationDate', expirationDate);
+      api.defaults.headers.common.Authorization = `Bearer ${response.accessToken}`;
+      console.log(response.accessToken);
     }
     setLoading(false);
   }
@@ -67,7 +64,6 @@ export const AuthProvider: React.FC = ({ children }) => {
         if (isAfter(currentTime, lastValidTime)) {
           handleAccessTokenWithRefreshToken(refreshToken);
         }
-        api.defaults.headers.Authorization = `Bearer ${accessToken}`;
         setLoading(false);
       }
     }
@@ -81,7 +77,7 @@ export const AuthProvider: React.FC = ({ children }) => {
     if (response && response.accessToken) {
       const { accessToken, refreshToken, expirationDate } = response;
 
-      api.defaults.headers.Authorization = `Bearer ${accessToken}`;
+      api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 
       await AsyncStorage.setItem('@SPG:accessToken', accessToken);
       await AsyncStorage.setItem('@SPG:refreshToken', refreshToken);

@@ -6,6 +6,7 @@ interface IImage {
 
 export interface IUserProfile {
   displayName: string;
+  email: string;
   href: string;
   id: string;
   images: IImage[];

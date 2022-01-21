@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, TouchableOpacity } from 'react-native';
+import { FlatList, TouchableOpacity, ListRenderItemInfo } from 'react-native';
 
 import {
   Container,
@@ -9,45 +9,20 @@ import {
   ItemTitle,
   ItemDescription,
   ItemInfoContainer,
+  MsgText,
 } from './styles';
+
+import Loading from '../../components/Loading';
 
 import { useAuth } from '../../contexts/auth';
 import { IPlaylist } from 'src/model/IPlaylist';
 import { getPlaylists, getUserProfile } from '../../services/spotify';
 
-const playlists = [
-  {
-    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    name: 'First Item',
-  },
-  {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    name: 'Second Item',
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145571e29d72',
-    name: 'Third Item',
-  },
-];
-
-interface IFlatlistItem {
-  item: {
-    id: string;
-    name: string;
-  };
-}
+import imageNotFound from '../../assets/image-not-found.jpg';
 
 interface IFlatlistRender {
-  item: {
-    id: string;
-    name: string;
-  };
-  onPress(data: IFlatlistPlaylist): void;
-}
-
-interface IFlatlistPlaylist {
-  id: string;
-  name: string;
+  item: IPlaylist;
+  onPress(data: IPlaylist): void;
 }
 
 interface Props {
@@ -56,30 +31,33 @@ interface Props {
 
 const Playlist: React.FC<Props> = ({ navigation }: Props) => {
   const { handlePlaylist } = useAuth();
-  const [data, setData] = useState<IPlaylist[]>([]);
+  const [playlists, setPlaylists] = useState<IPlaylist[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const Item = ({ item, onPress }: IFlatlistRender) => (
     <TouchableOpacity onPress={() => onPress(item)}>
       <ItemContainer>
         <ItemImage
           source={{
-            uri: 'https://cdn.neemo.com.br/uploads/settings_webdelivery/logo/3957/image-not-found.jpg',
+            uri: item.images[0].url ? item.images[0].url : imageNotFound,
           }}
         />
         <ItemInfoContainer>
           <ItemTitle>{item.name}</ItemTitle>
-          <ItemDescription>Minha playlist super incrível</ItemDescription>
-          <ItemDescription>Pública - Músicas: 129</ItemDescription>
+          <ItemDescription>{item.description}</ItemDescription>
+          <ItemDescription>
+            {`Public: ${item.public} - Total de músicas: ${item.tracks.total}`}
+          </ItemDescription>
         </ItemInfoContainer>
       </ItemContainer>
     </TouchableOpacity>
   );
 
-  const renderItem = ({ item }: IFlatlistItem) => (
+  const renderItem = ({ item }: ListRenderItemInfo<IPlaylist>) => (
     <Item item={item} onPress={goToHome} />
   );
 
-  const goToHome = (item: IFlatlistPlaylist) => {
+  const goToHome = (item: IPlaylist) => {
     const { id, name } = item;
     handlePlaylist({ data: { id, name } });
     navigation.navigate('HomeTab');
@@ -87,23 +65,34 @@ const Playlist: React.FC<Props> = ({ navigation }: Props) => {
 
   useEffect(() => {
     const getUserPlaylists = async () => {
+      setLoading(true);
       const user = await getUserProfile();
       const userPlaylists = await getPlaylists(user.id);
-      setData(userPlaylists);
+      setPlaylists(userPlaylists);
+      setLoading(false);
     };
     getUserPlaylists();
   }, []);
 
   return (
-    <Container>
-      <SafeAreaViewContainer>
-        <FlatList
-          data={data}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-        />
-      </SafeAreaViewContainer>
-    </Container>
+    <>
+      <Container>
+        {!loading && playlists && (
+          <SafeAreaViewContainer>
+            <MsgText>
+              Você pode adicionar novas músicas a uma playlist já criada
+              selecionando-a abaixo.
+            </MsgText>
+            <FlatList
+              data={playlists}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id}
+            />
+          </SafeAreaViewContainer>
+        )}
+        {loading && <Loading title="Buscando playlists..." />}
+      </Container>
+    </>
   );
 };
 
