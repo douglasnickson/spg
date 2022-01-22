@@ -1,16 +1,57 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { Container, Image, ButtonLogout, Text } from './styles';
+import {
+  Container,
+  Image,
+  ButtonLogout,
+  ProfileInfo,
+  InfoContainer,
+} from './styles';
 
-import logo from '../../assets/logo.png';
+import imageNotFound from '../../assets/image-not-found.jpg';
 import Button from '../../components/Button';
 
+import { getUserProfile } from '../../services/spotify';
+import { IUserProfile } from 'src/model/IUserProfile';
+
+import Loading from '../../components/Loading';
+
 const Configuration: React.FC = () => {
+  const [userProfile, setUserProfile] = useState<IUserProfile>();
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const getUser = async () => {
+      setLoading(true);
+      const profile = await getUserProfile();
+      setUserProfile(profile);
+      setLoading(false);
+    };
+    getUser();
+  }, []);
+
   return (
     <Container>
-      <Image source={logo} />
-      <Button>Remover Anúncios</Button>
-      <ButtonLogout>Sair do Aplicativo</ButtonLogout>
+      {!loading && userProfile && (
+        <>
+          <Image
+            source={{
+              uri: userProfile.images[0].url
+                ? userProfile.images[0].url
+                : imageNotFound,
+            }}
+          />
+          <InfoContainer>
+            <ProfileInfo>{userProfile.displayName}</ProfileInfo>
+            <ProfileInfo>E-mail: N/A</ProfileInfo>
+            <ProfileInfo>Seguidores: {userProfile.followers}</ProfileInfo>
+            <ProfileInfo>Tipo: {userProfile.type}</ProfileInfo>
+          </InfoContainer>
+          <Button>Remover Anúncios</Button>
+          <ButtonLogout>Sair do Aplicativo</ButtonLogout>
+        </>
+      )}
+      {loading && <Loading />}
     </Container>
   );
 };

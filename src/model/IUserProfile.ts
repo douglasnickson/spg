@@ -12,4 +12,5 @@ export interface IUserProfile {
   images: IImage[];
   type: string;
   uri: string;
+  followers: number;
 }

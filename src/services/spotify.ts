@@ -12,7 +12,8 @@ interface IImage {
 export async function getUserProfile(): Promise<IUserProfile> {
   try {
     const response = await api.get('/me');
-    const { display_name, id, email, href, images, type, uri } = response.data;
+    const { display_name, id, email, href, images, type, uri, followers } =
+      response.data;
     return {
       displayName: display_name,
       email,
@@ -21,6 +22,7 @@ export async function getUserProfile(): Promise<IUserProfile> {
       images,
       type,
       uri,
+      followers: followers.total,
     };
   } catch (err) {
     console.error(err);

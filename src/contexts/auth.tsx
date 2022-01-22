@@ -37,13 +37,12 @@ export const AuthProvider: React.FC = ({ children }) => {
     setLoading(true);
     const response = await auth.handleNewAccessToken(refreshToken);
     if (response) {
-      const expirationDate = addHours(new Date(), 2).toISOString();
+      const expirationDate = addHours(new Date(), 1).toISOString();
 
-      await AsyncStorage.setItem('@SPGAuth:accessToken', response.accessToken);
+      await AsyncStorage.setItem('@SPG:accessToken', response.accessToken);
       await AsyncStorage.setItem('@SPG:refreshToken', response.refreshToken);
       await AsyncStorage.setItem('@SPG:expirationDate', expirationDate);
       api.defaults.headers.common.Authorization = `Bearer ${response.accessToken}`;
-      console.log(response.accessToken);
     }
     setLoading(false);
   }
@@ -55,6 +54,8 @@ export const AuthProvider: React.FC = ({ children }) => {
       const expirationDate = await AsyncStorage.getItem('@SPG:expirationDate');
 
       if (accessToken && refreshToken && expirationDate) {
+        api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+
         setLoading(true);
         const currentTime = addHours(new Date(), 1);
         const lastValidTime = addHours(parseISO(expirationDate), 1);
