@@ -47,7 +47,7 @@ export async function getPlaylists(userId: string): Promise<IPlaylist[]> {
   }
 }
 
-export async function getArtist(artist: string): Promise<IArtist[]> {
+export async function getArtists(artist: string): Promise<IArtist[]> {
   try {
     const response = await api.get(`/search?q=${artist}&type=artist`);
     const { artists } = response.data;
@@ -56,7 +56,7 @@ export async function getArtist(artist: string): Promise<IArtist[]> {
     const result = items
       .filter((item: IArtist) => item.name.includes(artist))
       .map((item: IArtist) => ({
-        genres: { ...item.genres },
+        genres: [...item.genres],
         id: item.id,
         images: item.images.slice(),
         name: item.name,

@@ -1,19 +1,20 @@
 import React from 'react';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Dashboard from '../pages/Dashboard';
 import Playlists from '../pages/Playlists';
 import Configuration from '../pages/Configuration';
+import Search from '../pages/Search';
 
 const Tabs = createBottomTabNavigator();
 const HomeStack = createStackNavigator();
 const PlaylistStack = createStackNavigator();
 const SettingsStack = createStackNavigator();
 
-const HomeStackScreen = ({ route }) => (
+const HomeStackScreen = () => (
   <HomeStack.Navigator
     screenOptions={{
       headerStyle: {
@@ -24,7 +25,16 @@ const HomeStackScreen = ({ route }) => (
         fontWeight: 'bold',
       },
     }}>
-    <HomeStack.Screen name="Criar Playlist" component={Dashboard} />
+    <HomeStack.Screen
+      name="Criar Playlist"
+      component={Dashboard}
+      options={{ title: 'Criar Playlist' }}
+    />
+    <HomeStack.Screen
+      name="Search"
+      component={Search}
+      options={{ title: 'Informações Adicionais' }}
+    />
   </HomeStack.Navigator>
 );
 

@@ -16,11 +16,7 @@ import Loading from '../../components/Loading';
 
 import { useAuth } from '../../contexts/auth';
 import { IPlaylist } from 'src/model/IPlaylist';
-import {
-  getPlaylists,
-  getUserProfile,
-  getArtist,
-} from '../../services/spotify';
+import { getPlaylists, getUserProfile } from '../../services/spotify';
 
 import imageNotFound from '../../assets/image-not-found.jpg';
 
@@ -72,7 +68,6 @@ const Playlist: React.FC<Props> = ({ navigation }: Props) => {
       setLoading(true);
       const user = await getUserProfile();
       const userPlaylists = await getPlaylists(user.id);
-      await getArtist('Pink Floyd');
       setPlaylists(userPlaylists);
       setLoading(false);
     };

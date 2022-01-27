@@ -42,16 +42,23 @@ interface IFlatlistItem {
   item: string;
 }
 
-const Dashboard: React.FC = () => {
+interface Props {
+  navigation: any;
+}
+
+const Dashboard: React.FC<Props> = ({ navigation }: Props) => {
   const [showCategory, setShowCategory] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [category, setCategory] = useState<string>('unknown');
-  const [artists, setArtists] = useState<string[]>([]);
+  const [category, setCategory] = useState<string>('artist');
+  const [artists, setArtists] = useState<string[]>([
+    'Pink Floyd',
+    'Iron Maiden',
+  ]);
   const [artist, setArtist] = useState('');
   const [genre, setGenre] = useState('unknown');
-  const [description, setDescription] = useState('');
-  const [totalMusics, setTotalMusics] = useState('');
-  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('teste');
+  const [totalMusics, setTotalMusics] = useState('3');
+  const [title, setTitle] = useState('teste');
   const [collaborative, setCollaborative] = useState(false);
   const [isPublic, setIsPublic] = useState(true);
   const [playlist, setPlaylist] = useState<IPlaylist | null>(null);
@@ -104,6 +111,22 @@ const Dashboard: React.FC = () => {
     setIsPublic(true);
     setGenre('unknown');
     setPlaylist(null);
+  };
+
+  const handleSubmit = () => {
+    const data = {
+      category,
+      artists,
+      description,
+      totalMusics,
+      title,
+      collaborative,
+      isPublic,
+      genre,
+      playlist,
+    };
+
+    navigation.navigate('Search', { data });
   };
 
   const Item = ({ item }: IFlatlistItem) => (
@@ -253,7 +276,7 @@ const Dashboard: React.FC = () => {
             <Ionicons name={'information-circle'} size={32} color={'#1ed760'} />
           </TouchableOpacity>
         )}
-        <Button>Criar Playlist</Button>
+        <Button onPress={handleSubmit}>Criar Playlist</Button>
         <BtReset onPress={handleReset}>Reiniciar</BtReset>
       </Container>
     </ScrollView>
