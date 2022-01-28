@@ -1,5 +1,7 @@
 import styled from 'styled-components/native';
 
+import Button from '../../components/Button';
+
 export const Container = styled.View`
   flex: 1;
   background-color: #272727;
@@ -13,7 +15,7 @@ export const SafeAreaViewContainer = styled.SafeAreaView`
   justify-content: center;
   align-items: center;
   margin-top: 12px;
-  margin-bottom: 55px;
+  margin-bottom: 16px;
 `;
 
 export const ItemContainer = styled.View`
@@ -55,7 +57,38 @@ export const MsgText = styled.Text`
   color: #fff;
   margin: 8px 5px 8px 5px;
   text-align: center;
-  border: 1px solid #ccc;
   padding: 8px;
   border-radius: 8px;
+  font-weight: 500;
+`;
+
+export const PlaylistInfoContainer = styled.View`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  border: 1px solid #ccc;
+  width: 90%;
+  padding: 8px;
+  border-radius: 8px;
+`;
+
+export const PlaylistInfoText = styled.Text`
+  color: #fff;
+  font-size: 14px;
+  text-align: left;
+  padding: 4px;
+`;
+
+export const PlaylistInfoTextBold = styled.Text`
+  color: #fff;
+  font-size: 14px;
+  text-align: left;
+  padding: 4px;
+  font-weight: 500;
+`;
+
+export const ButtonSubmit = styled(Button)`
+  background-color: red;
+  margin-top: 24px;
 `;

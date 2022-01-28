@@ -33,7 +33,7 @@ const HomeStackScreen = () => (
     <HomeStack.Screen
       name="Search"
       component={Search}
-      options={{ title: 'Informações Adicionais' }}
+      options={{ title: 'Detalhes da Playlist' }}
     />
   </HomeStack.Navigator>
 );

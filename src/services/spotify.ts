@@ -71,3 +71,14 @@ export async function getArtists(artist: string): Promise<IArtist[]> {
     throw new Error('Failed to get artist. Error: ' + err);
   }
 }
+
+export async function getGenres(): Promise<string[]> {
+  try {
+    const response = await api.get('/recommendations/available-genre-seeds');
+    const { genres } = response.data;
+    return genres;
+  } catch (err) {
+    console.error(err);
+    throw new Error('Failed to get genres. Error: ' + err);
+  }
+}

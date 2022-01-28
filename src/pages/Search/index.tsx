@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View,
   Text,
   FlatList,
   TouchableOpacity,
   ListRenderItemInfo,
+  Modal,
 } from 'react-native';
 
 import { IArtist } from 'src/model/IArtist';
@@ -19,9 +19,14 @@ import {
   ItemDescription,
   ItemInfoContainer,
   MsgText,
+  PlaylistInfoContainer,
+  PlaylistInfoText,
+  PlaylistInfoTextBold,
+  ButtonSubmit,
 } from './styles';
 
 import Loading from '../../components/Loading';
+import Button from '../../components/Button';
 import imageNotFound from '../../assets/image-not-found.jpg';
 
 type IArtistRender = {
@@ -33,12 +38,22 @@ export default function Search({ route }) {
   const { data } = route.params;
 
   const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [artists, setArtists] = useState([]);
   const [genre, setGenre] = useState('unknown');
   const [artistList, setArtistList] = useState<IArtist[]>([]);
+  const [selectedArtists, setSelectedArtists] = useState<IArtist[]>([]);
+
+  const handleSubmit = () => {
+    console.log('Criando playlist');
+  };
 
   const selectArtist = (artist: IArtist) => {
-    console.log(artist);
+    setSelectedArtists([...selectedArtists, artist]);
+  };
+
+  const openCloseModal = () => {
+    setShowModal(!showModal);
   };
 
   const Item = ({ item, onPress }: IArtistRender) => (
@@ -85,7 +100,6 @@ export default function Search({ route }) {
           return b.popularity - a.popularity;
         });
 
-      console.log(artistsOrdered);
       setArtistList([...artistsOrdered]);
       setLoading(false);
     };
@@ -96,21 +110,87 @@ export default function Search({ route }) {
     if (data.artists.length > 0) {
       handleArtists();
     }
+    console.log(data);
   }, [data, artists]);
 
   return (
     <Container>
-      {!loading && artistList && (
-        <SafeAreaViewContainer>
-          <Text>Selecione os artistas que você deseja adicionar.</Text>
-          <FlatList
-            data={artistList}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.uri}
-          />
-        </SafeAreaViewContainer>
+      {genre === 'unknown' && (
+        <>
+          <MsgText>
+            Selecione os artistas que você deseja adicionar na playlist.
+          </MsgText>
+          <Button onPress={openCloseModal}>Selecionar Artistas</Button>
+          <MsgText>
+            Confirme as informações da playlist que será criada abaixo.
+          </MsgText>
+        </>
       )}
-      {loading && <Loading title="Buscando artistas..." />}
+      <PlaylistInfoContainer>
+        <PlaylistInfoText>
+          <PlaylistInfoTextBold>Título: </PlaylistInfoTextBold>
+          {data.title}
+        </PlaylistInfoText>
+        <PlaylistInfoText>
+          <PlaylistInfoTextBold>Descrição: </PlaylistInfoTextBold>
+          {data.description}
+        </PlaylistInfoText>
+        {genre !== 'unknown' && (
+          <PlaylistInfoText>
+            <PlaylistInfoTextBold>Gênero: </PlaylistInfoTextBold>
+            {data.genre}
+          </PlaylistInfoText>
+        )}
+        <PlaylistInfoText>
+          <PlaylistInfoTextBold>Total de Músicas: </PlaylistInfoTextBold>
+          {data.totalMusics}
+        </PlaylistInfoText>
+        <PlaylistInfoText>
+          <PlaylistInfoTextBold>Publica: </PlaylistInfoTextBold>
+          {data.isPublic ? 'Sim' : 'Não'}
+        </PlaylistInfoText>
+        <PlaylistInfoText>
+          <PlaylistInfoTextBold>Colaborativa: </PlaylistInfoTextBold>
+          {data.collaborative ? 'Sim' : 'Não'}
+        </PlaylistInfoText>
+        {genre === 'unknown' && (
+          <PlaylistInfoText>
+            <PlaylistInfoTextBold>Artistas Selecionados: </PlaylistInfoTextBold>
+            {selectedArtists.length === 0 && (
+              <PlaylistInfoText>Nenhum artista selecionado</PlaylistInfoText>
+            )}
+            {selectedArtists.length > 0 &&
+              selectedArtists.map((artist) => (
+                <PlaylistInfoText key={artist.id}>
+                  {artist.name}
+                  {', '}
+                </PlaylistInfoText>
+              ))}
+          </PlaylistInfoText>
+        )}
+      </PlaylistInfoContainer>
+      <ButtonSubmit onPress={handleSubmit}>Criar Playlist</ButtonSubmit>
+
+      <Modal
+        animationType="slide"
+        visible={showModal}
+        onRequestClose={() => {
+          setShowModal(!showModal);
+        }}>
+        <Container>
+          {!loading && artistList && (
+            <SafeAreaViewContainer>
+              <FlatList
+                data={artistList}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.uri}
+              />
+              <Button onPress={openCloseModal}>Fechar Modal</Button>
+            </SafeAreaViewContainer>
+          )}
+          {loading && <Loading title="Buscando artistas..." />}
+        </Container>
+      </Modal>
     </Container>
   );
 }

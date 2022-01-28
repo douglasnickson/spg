@@ -30,6 +30,7 @@ import logo from '../../assets/logo.png';
 import Button from '../../components/Button';
 
 import { useAuth } from '../../contexts/auth';
+import { getGenres } from '../../services/spotify';
 
 interface IPlaylist {
   data: {
@@ -62,6 +63,7 @@ const Dashboard: React.FC<Props> = ({ navigation }: Props) => {
   const [collaborative, setCollaborative] = useState(false);
   const [isPublic, setIsPublic] = useState(true);
   const [playlist, setPlaylist] = useState<IPlaylist | null>(null);
+  const [genres, setGenres] = useState<string[]>([]);
 
   const { currentPlaylist } = useAuth();
 
@@ -138,10 +140,19 @@ const Dashboard: React.FC<Props> = ({ navigation }: Props) => {
   const renderItem = ({ item }: IFlatlistItem) => <Item item={item} />;
 
   useEffect(() => {
+    const handleGenres = async () => {
+      const response = await getGenres();
+      setGenres(response);
+    };
+
     if (currentPlaylist) {
       setPlaylist(currentPlaylist);
     }
-  }, [currentPlaylist]);
+
+    if (category === 'genre') {
+      handleGenres();
+    }
+  }, [currentPlaylist, category]);
 
   return (
     <ScrollView style={styles.scrollViewStyle}>
@@ -186,13 +197,13 @@ const Dashboard: React.FC<Props> = ({ navigation }: Props) => {
                   value="unknown"
                   style={styles.placeholderStyle}
                 />
-                <Picker.Item label="Banda/Artistas" value="artista" />
-                <Picker.Item label="Gênero Musical" value="genero" />
+                <Picker.Item label="Banda/Artistas" value="artist" />
+                <Picker.Item label="Gênero Musical" value="genre" />
               </CustomPicker>
             </PickerContainer>
           </>
         )}
-        {category && category === 'artista' && (
+        {category && category === 'artist' && (
           <>
             <TextInputContainer>
               <CustomTextInput
@@ -208,7 +219,7 @@ const Dashboard: React.FC<Props> = ({ navigation }: Props) => {
             </TextInputContainer>
           </>
         )}
-        {category && category === 'genero' && (
+        {category && category === 'genre' && (
           <>
             <PickerContainer>
               <CustomPicker
@@ -220,9 +231,10 @@ const Dashboard: React.FC<Props> = ({ navigation }: Props) => {
                   value="unknown"
                   style={styles.placeholderStyle}
                 />
-                <Picker.Item label="Rock" value="rock" />
-                <Picker.Item label="Blues" value="blues" />
-                <Picker.Item label="Jazz" value="jazz" />
+                {genres &&
+                  genres.map((item: string) => (
+                    <Picker.Item key={item} label={item} value={item} />
+                  ))}
               </CustomPicker>
             </PickerContainer>
           </>
@@ -276,7 +288,7 @@ const Dashboard: React.FC<Props> = ({ navigation }: Props) => {
             <Ionicons name={'information-circle'} size={32} color={'#1ed760'} />
           </TouchableOpacity>
         )}
-        <Button onPress={handleSubmit}>Criar Playlist</Button>
+        <Button onPress={handleSubmit}>Próximo</Button>
         <BtReset onPress={handleReset}>Reiniciar</BtReset>
       </Container>
     </ScrollView>
