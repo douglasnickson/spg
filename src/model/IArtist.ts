@@ -6,7 +6,7 @@ interface IImage {
 
 export interface IArtist {
   genres: string[];
-  id: number;
+  id: string;
   images: IImage[];
   name: string;
   popularity: number;

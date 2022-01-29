@@ -43,6 +43,7 @@ export const AuthProvider: React.FC = ({ children }) => {
       await AsyncStorage.setItem('@SPG:refreshToken', response.refreshToken);
       await AsyncStorage.setItem('@SPG:expirationDate', expirationDate);
       api.defaults.headers.common.Authorization = `Bearer ${response.accessToken}`;
+      console.log(response.accessToken);
     }
     setLoading(false);
   }

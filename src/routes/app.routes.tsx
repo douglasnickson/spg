@@ -7,7 +7,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Dashboard from '../pages/Dashboard';
 import Playlists from '../pages/Playlists';
 import Configuration from '../pages/Configuration';
-import Search from '../pages/Search';
+import Search from '../pages/CreatePlaylist';
 
 const Tabs = createBottomTabNavigator();
 const HomeStack = createStackNavigator();

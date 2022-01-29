@@ -5,10 +5,19 @@ import {
   TouchableOpacity,
   ListRenderItemInfo,
   Modal,
+  Alert,
 } from 'react-native';
 
 import { IArtist } from 'src/model/IArtist';
-import { getArtists } from '../../services/spotify';
+import {
+  getArtists,
+  getArtistAlbums,
+  getAlbumTracks,
+  getUserProfile,
+  createPlaylist,
+  addTracksToPlaylist,
+  getArtistsByGenre,
+} from '../../services/spotify';
 
 import {
   Container,
@@ -24,6 +33,8 @@ import {
   PlaylistInfoTextBold,
   ButtonSubmit,
 } from './styles';
+
+import { getRandomItems, parseTracksWithUri } from '../../utils/Utils';
 
 import Loading from '../../components/Loading';
 import Button from '../../components/Button';
@@ -44,8 +55,45 @@ export default function Search({ route }) {
   const [artistList, setArtistList] = useState<IArtist[]>([]);
   const [selectedArtists, setSelectedArtists] = useState<IArtist[]>([]);
 
-  const handleSubmit = () => {
-    console.log('Criando playlist');
+  const handleSubmit = async () => {
+    const playlistInfo = {
+      name: data.title,
+      description: data.description,
+      public: data.isPublic,
+      collaborative: data.collaborative,
+    };
+
+    if (selectedArtists.length === 0) {
+      Alert.alert('Erro', 'Selecione pelo menos um artista');
+      return;
+    }
+
+    const userProfile = await getUserProfile();
+
+    const artistsIds = selectedArtists.map((artist) => artist.id);
+
+    const albumIds = [];
+    for (const artistId of artistsIds) {
+      const response = await getArtistAlbums(artistId);
+      albumIds.push(...response);
+    }
+
+    const tracksIds = [];
+    for (const albumId of albumIds) {
+      const response = await getAlbumTracks(albumId);
+      tracksIds.push(...response);
+    }
+
+    const randomTracks = getRandomItems(tracksIds, data.totalMusics);
+    const tracksFormatted = parseTracksWithUri(randomTracks);
+
+    const playlistId = await createPlaylist(playlistInfo, userProfile.id);
+    if (!playlistId) {
+      Alert.alert('Erro', 'Não foi possível criar a playlist');
+      return;
+    }
+
+    await addTracksToPlaylist(tracksFormatted, playlistId);
   };
 
   const selectArtist = (artist: IArtist) => {
@@ -89,18 +137,29 @@ export default function Search({ route }) {
 
       const result = [] as IArtist[];
 
-      for (const artist of artists) {
-        const response = await getArtists(artist);
-        result.push(...response);
+      if (data.category === 'artist') {
+        for (const artist of artists) {
+          const response = await getArtists(artist);
+          result.push(...response);
+        }
+
+        const artistsOrdered = result
+          .filter((artist) => artist.images[0])
+          .sort((a, b) => {
+            return b.popularity - a.popularity;
+          });
+
+        setArtistList([...artistsOrdered]);
+      } else {
+        const response = await getArtistsByGenre(genre);
+        const artistsFiltered = response
+          .filter((artist) => artist.images[0])
+          .sort((a, b) => {
+            return b.popularity - a.popularity;
+          });
+        setArtistList([...artistsFiltered]);
       }
 
-      const artistsOrdered = result
-        .filter((artist) => artist.images[0])
-        .sort((a, b) => {
-          return b.popularity - a.popularity;
-        });
-
-      setArtistList([...artistsOrdered]);
       setLoading(false);
     };
 
@@ -111,21 +170,19 @@ export default function Search({ route }) {
       handleArtists();
     }
     console.log(data);
-  }, [data, artists]);
+  }, [data, artists, genre]);
 
   return (
     <Container>
-      {genre === 'unknown' && (
-        <>
-          <MsgText>
-            Selecione os artistas que você deseja adicionar na playlist.
-          </MsgText>
-          <Button onPress={openCloseModal}>Selecionar Artistas</Button>
-          <MsgText>
-            Confirme as informações da playlist que será criada abaixo.
-          </MsgText>
-        </>
-      )}
+      <>
+        <MsgText>
+          Selecione os artistas que você deseja adicionar na playlist.
+        </MsgText>
+        <Button onPress={openCloseModal}>Selecionar Artistas</Button>
+        <MsgText>
+          Confirme as informações da playlist que será criada abaixo.
+        </MsgText>
+      </>
       <PlaylistInfoContainer>
         <PlaylistInfoText>
           <PlaylistInfoTextBold>Título: </PlaylistInfoTextBold>

@@ -1,4 +1,5 @@
 import { IArtist } from 'src/model/IArtist';
+import { INewPlaylist } from 'src/model/INewPlaylist';
 import { IPlaylist } from 'src/model/IPlaylist';
 import { IUserProfile } from 'src/model/IUserProfile';
 
@@ -80,5 +81,110 @@ export async function getGenres(): Promise<string[]> {
   } catch (err) {
     console.error(err);
     throw new Error('Failed to get genres. Error: ' + err);
+  }
+}
+
+export async function getArtistsByGenre(genre: string): Promise<IArtist[]> {
+  try {
+    const response = await api.get(`/search?q=${genre}&type=artist&limit=50`);
+    const { artists } = response.data;
+    const { items } = artists;
+
+    const result = items
+      .map((item: IArtist) => ({
+        genres: [...item.genres],
+        id: item.id,
+        images: item.images.slice(),
+        name: item.name,
+        popularity: item.popularity,
+        type: item.type,
+        uri: item.uri,
+      }))
+      .sort((a: IArtist, b: IArtist) => b.popularity - a.popularity);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error('Failed to get artist. Error: ' + err);
+  }
+}
+
+export async function getArtistAlbums(artistId: string): Promise<string[]> {
+  try {
+    const response = await api.get(
+      `/artists/${artistId}/albums?market=BR&include_groups=album`
+    );
+    const { items } = response.data;
+    const result = items.map((item: any) => item.id);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error('Failed to get artist albums. Error: ' + err);
+  }
+}
+
+export async function getAlbumTracks(albumId: string): Promise<string[]> {
+  try {
+    const response = await api.get(
+      `/albums/${albumId}/tracks?market=BR&limit=50`
+    );
+    const { items } = response.data;
+    const result = items.map((item: any) => item.id);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error('Failed to get album tracks. Error: ' + err);
+  }
+}
+
+export async function createPlaylist(
+  playlistInfo: INewPlaylist,
+  userId: string
+): Promise<string> {
+  try {
+    const headers = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    const data = {
+      name: playlistInfo.name,
+      description: playlistInfo.description,
+      public: playlistInfo.public,
+      collaborative: playlistInfo.collaborative,
+    };
+
+    const response = await api.post(
+      `/users/${userId}/playlists`,
+      data,
+      headers
+    );
+    const { id } = response.data;
+    return id;
+  } catch (err) {
+    console.error(err);
+    throw new Error('Failed to create new playlist. Error: ' + err);
+  }
+}
+
+export async function addTracksToPlaylist(
+  trackList: string[],
+  playlistId: string
+): Promise<void> {
+  try {
+    const headers = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    const data = {
+      uris: trackList,
+    };
+
+    await api.post(`/playlists/${playlistId}/tracks`, data, headers);
+  } catch (err) {
+    console.error(err);
+    throw new Error('Failed to add tracks to playlist. Error: ' + err);
   }
 }
