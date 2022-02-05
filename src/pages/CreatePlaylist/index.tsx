@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { TestIds, BannerAd, BannerAdSize } from '@react-native-firebase/admob';
+
 import {
   Text,
   FlatList,
@@ -21,6 +23,7 @@ import {
 
 import {
   Container,
+  ContainerModal,
   SafeAreaViewContainer,
   ItemContainer,
   ItemImage,
@@ -258,7 +261,19 @@ export default function Search({ route, navigation }: Props) {
       <ButtonSubmit disabled={creatingPlaylist} onPress={handleSubmit}>
         Criar Playlist
       </ButtonSubmit>
-
+      <BannerAd
+        unitId={TestIds.BANNER}
+        size={BannerAdSize.SMART_BANNER}
+        requestOptions={{
+          requestNonPersonalizedAdsOnly: true,
+        }}
+        onAdLoaded={() => {
+          console.log('Advert loaded');
+        }}
+        onAdFailedToLoad={(error) => {
+          console.error('Advert failed to load: ', error);
+        }}
+      />
       {creatingPlaylist && <Loading title="Criando playlist..." />}
 
       <Modal
@@ -267,7 +282,7 @@ export default function Search({ route, navigation }: Props) {
         onRequestClose={() => {
           setShowModal(!showModal);
         }}>
-        <Container>
+        <ContainerModal>
           {!loading && artistList && (
             <SafeAreaViewContainer>
               <MsgText>
@@ -280,10 +295,23 @@ export default function Search({ route, navigation }: Props) {
                 keyExtractor={(item) => item.uri}
               />
               <Button onPress={openCloseModal}>Fechar Modal</Button>
+              <BannerAd
+                unitId={TestIds.BANNER}
+                size={BannerAdSize.SMART_BANNER}
+                requestOptions={{
+                  requestNonPersonalizedAdsOnly: true,
+                }}
+                onAdLoaded={() => {
+                  console.log('Advert loaded');
+                }}
+                onAdFailedToLoad={(error) => {
+                  console.error('Advert failed to load: ', error);
+                }}
+              />
             </SafeAreaViewContainer>
           )}
           {loading && <Loading title="Buscando artistas..." />}
-        </Container>
+        </ContainerModal>
       </Modal>
     </Container>
   );

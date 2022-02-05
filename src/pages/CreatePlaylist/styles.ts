@@ -6,7 +6,16 @@ export const Container = styled.View`
   flex: 1;
   background-color: #272727;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-around;
+  flex-direction: column;
+  margin-bottom: 48px;
+`;
+
+export const ContainerModal = styled.View`
+  flex: 1;
+  background-color: #272727;
+  align-items: center;
+  justify-content: space-around;
   flex-direction: column;
 `;
 

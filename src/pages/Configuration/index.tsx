@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { TestIds, BannerAd, BannerAdSize } from '@react-native-firebase/admob';
 
 import {
   Container,
@@ -49,6 +50,19 @@ const Configuration: React.FC = () => {
           </InfoContainer>
           <Button>Remover Anúncios</Button>
           <ButtonLogout>Sair do Aplicativo</ButtonLogout>
+          <BannerAd
+            unitId={TestIds.BANNER}
+            size={BannerAdSize.SMART_BANNER}
+            requestOptions={{
+              requestNonPersonalizedAdsOnly: true,
+            }}
+            onAdLoaded={() => {
+              console.log('Advert loaded');
+            }}
+            onAdFailedToLoad={(error) => {
+              console.error('Advert failed to load: ', error);
+            }}
+          />
         </>
       )}
       {loading && <Loading />}

@@ -8,6 +8,7 @@ export const Container = styled.View`
   padding: 24px;
   justify-content: center;
   flex-direction: column;
+  margin-bottom: 32px;
 `;
 
 export const Image = styled.Image`
@@ -19,7 +20,7 @@ export const Image = styled.Image`
 
 export const ButtonLogout = styled(Button)`
   background: red;
-  margin-bottom: 64px;
+  margin-bottom: 24px;
 `;
 
 export const InfoContainer = styled.View`

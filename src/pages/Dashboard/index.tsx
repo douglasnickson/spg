@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Picker } from '@react-native-picker/picker';
+import { TestIds, BannerAd, BannerAdSize } from '@react-native-firebase/admob';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import {
@@ -313,6 +314,19 @@ const Dashboard: React.FC<Props> = ({ navigation }: Props) => {
         )}
         <Button onPress={handleSubmit}>Próximo</Button>
         <BtReset onPress={handleReset}>Reiniciar</BtReset>
+        <BannerAd
+          unitId={TestIds.BANNER}
+          size={BannerAdSize.SMART_BANNER}
+          requestOptions={{
+            requestNonPersonalizedAdsOnly: true,
+          }}
+          onAdLoaded={() => {
+            console.log('Advert loaded');
+          }}
+          onAdFailedToLoad={(error) => {
+            console.error('Advert failed to load: ', error);
+          }}
+        />
       </Container>
     </ScrollView>
   );

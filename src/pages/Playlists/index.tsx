@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FlatList, TouchableOpacity, ListRenderItemInfo } from 'react-native';
+import { TestIds, BannerAd, BannerAdSize } from '@react-native-firebase/admob';
 
 import {
   Container,
@@ -86,6 +87,19 @@ const Playlist: React.FC<Props> = ({ navigation }: Props) => {
               data={playlists}
               renderItem={renderItem}
               keyExtractor={(item) => item.id}
+            />
+            <BannerAd
+              unitId={TestIds.BANNER}
+              size={BannerAdSize.SMART_BANNER}
+              requestOptions={{
+                requestNonPersonalizedAdsOnly: true,
+              }}
+              onAdLoaded={() => {
+                console.log('Advert loaded');
+              }}
+              onAdFailedToLoad={(error) => {
+                console.error('Advert failed to load: ', error);
+              }}
             />
           </SafeAreaViewContainer>
         )}
