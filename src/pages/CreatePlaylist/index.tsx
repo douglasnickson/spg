@@ -45,10 +45,16 @@ type IArtistRender = {
   onPress(data: IArtist): void;
 };
 
-export default function Search({ route }) {
+type Props = {
+  route: any;
+  navigation: any;
+};
+
+export default function Search({ route, navigation }: Props) {
   const { data } = route.params;
 
   const [loading, setLoading] = useState(false);
+  const [creatingPlaylist, setCreatingPlaylist] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [artists, setArtists] = useState([]);
   const [genre, setGenre] = useState('unknown');
@@ -64,39 +70,60 @@ export default function Search({ route }) {
     };
 
     if (selectedArtists.length === 0) {
-      Alert.alert('Erro', 'Selecione pelo menos um artista');
+      Alert.alert(
+        'Ops!',
+        'Você deve selecionar pelo menos um artista para criar a playlist'
+      );
       return;
     }
 
-    const userProfile = await getUserProfile();
+    setCreatingPlaylist(true);
+    try {
+      const userProfile = await getUserProfile();
 
-    const artistsIds = selectedArtists.map((artist) => artist.id);
+      const artistsIds = selectedArtists.map((artist) => artist.id);
 
-    const albumIds = [];
-    for (const artistId of artistsIds) {
-      const response = await getArtistAlbums(artistId);
-      albumIds.push(...response);
+      const albumIds = [];
+      for (const artistId of artistsIds) {
+        const response = await getArtistAlbums(artistId);
+        albumIds.push(...response);
+      }
+
+      const tracksIds = [];
+      for (const albumId of albumIds) {
+        const response = await getAlbumTracks(albumId);
+        tracksIds.push(...response);
+      }
+
+      const randomTracks = getRandomItems(tracksIds, data.totalMusics);
+      const tracksFormatted = parseTracksWithUri(randomTracks);
+
+      const playlistId = await createPlaylist(playlistInfo, userProfile.id);
+      if (!playlistId) {
+        Alert.alert('Erro', 'Não foi possível criar a playlist');
+        return;
+      }
+
+      await addTracksToPlaylist(tracksFormatted, playlistId);
+      setCreatingPlaylist(false);
+      navigation.navigate('Result');
+    } catch (err) {
+      Alert.alert('Ops', 'Não foi possível criar a playlist');
+      setCreatingPlaylist(false);
     }
-
-    const tracksIds = [];
-    for (const albumId of albumIds) {
-      const response = await getAlbumTracks(albumId);
-      tracksIds.push(...response);
-    }
-
-    const randomTracks = getRandomItems(tracksIds, data.totalMusics);
-    const tracksFormatted = parseTracksWithUri(randomTracks);
-
-    const playlistId = await createPlaylist(playlistInfo, userProfile.id);
-    if (!playlistId) {
-      Alert.alert('Erro', 'Não foi possível criar a playlist');
-      return;
-    }
-
-    await addTracksToPlaylist(tracksFormatted, playlistId);
   };
 
   const selectArtist = (artist: IArtist) => {
+    const isFound = selectedArtists.find(
+      (artistSelected) => artistSelected.id === artist.id
+    );
+    if (isFound) {
+      const arrayWithoutElment = selectedArtists.filter(
+        (element) => element.id !== artist.id
+      );
+      setSelectedArtists(arrayWithoutElment);
+      return;
+    }
     setSelectedArtists([...selectedArtists, artist]);
   };
 
@@ -178,7 +205,9 @@ export default function Search({ route }) {
         <MsgText>
           Selecione os artistas que você deseja adicionar na playlist.
         </MsgText>
-        <Button onPress={openCloseModal}>Selecionar Artistas</Button>
+        <Button disabled={creatingPlaylist} onPress={openCloseModal}>
+          Selecionar Artistas
+        </Button>
         <MsgText>
           Confirme as informações da playlist que será criada abaixo.
         </MsgText>
@@ -226,7 +255,11 @@ export default function Search({ route }) {
           </PlaylistInfoText>
         )}
       </PlaylistInfoContainer>
-      <ButtonSubmit onPress={handleSubmit}>Criar Playlist</ButtonSubmit>
+      <ButtonSubmit disabled={creatingPlaylist} onPress={handleSubmit}>
+        Criar Playlist
+      </ButtonSubmit>
+
+      {creatingPlaylist && <Loading title="Criando playlist..." />}
 
       <Modal
         animationType="slide"
@@ -237,6 +270,10 @@ export default function Search({ route }) {
         <Container>
           {!loading && artistList && (
             <SafeAreaViewContainer>
+              <MsgText>
+                Selecione um artista abaixo para adicionar na playlist. Caso
+                você queira remover um artista, basta seleciona-lo novamente.
+              </MsgText>
               <FlatList
                 data={artistList}
                 renderItem={renderItem}

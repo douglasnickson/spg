@@ -9,6 +9,7 @@ import {
   Modal,
   FlatList,
   StyleSheet,
+  Alert,
 } from 'react-native';
 
 import {
@@ -51,15 +52,12 @@ const Dashboard: React.FC<Props> = ({ navigation }: Props) => {
   const [showCategory, setShowCategory] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [category, setCategory] = useState<string>('artist');
-  const [artists, setArtists] = useState<string[]>([
-    'Pink Floyd',
-    'Iron Maiden',
-  ]);
+  const [artists, setArtists] = useState<string[]>([]);
   const [artist, setArtist] = useState('');
   const [genre, setGenre] = useState('unknown');
-  const [description, setDescription] = useState('teste');
-  const [totalMusics, setTotalMusics] = useState('3');
-  const [title, setTitle] = useState('teste');
+  const [description, setDescription] = useState('');
+  const [totalMusics, setTotalMusics] = useState('');
+  const [title, setTitle] = useState('');
   const [collaborative, setCollaborative] = useState(false);
   const [isPublic, setIsPublic] = useState(true);
   const [playlist, setPlaylist] = useState<IPlaylist | null>(null);
@@ -116,6 +114,26 @@ const Dashboard: React.FC<Props> = ({ navigation }: Props) => {
   };
 
   const handleSubmit = () => {
+    if (artists.length === 0 && genre === 'unknown') {
+      Alert.alert('Ops!', 'Por favor, selecione o tipo de playlist');
+      return;
+    }
+
+    if (title === '' || description === '' || totalMusics === '') {
+      Alert.alert('Ops!', 'Por favor, preencha todos os campos');
+      return;
+    }
+
+    if (parseInt(totalMusics, 10) > 99) {
+      Alert.alert('Ops', 'Você deve selecionar no máximo 99 músicas');
+      return;
+    }
+
+    if (parseInt(totalMusics, 10) < 1) {
+      Alert.alert('Ops', 'O total de músicas deve ser maior que 0');
+      return;
+    }
+
     const data = {
       category,
       artists,
@@ -209,7 +227,11 @@ const Dashboard: React.FC<Props> = ({ navigation }: Props) => {
               <CustomTextInput
                 onChangeText={setArtist}
                 value={artist}
-                placeholder="Informe a banda/artista"
+                placeholder={
+                  artists && artists.length > 0
+                    ? artists.length + ' artistas selecionados'
+                    : 'Informe a banda/artista'
+                }
               />
               <TouchableOpacity
                 style={styles.btAddArtist}
@@ -257,7 +279,8 @@ const Dashboard: React.FC<Props> = ({ navigation }: Props) => {
           <CustomTextInput
             onChangeText={setTotalMusics}
             value={totalMusics}
-            placeholder="Total de músicas (0-99)"
+            placeholder="Total de músicas (1-99)"
+            maxLength={99}
             keyboardType="numeric"
           />
         </TextInputContainer>

@@ -8,6 +8,7 @@ import Dashboard from '../pages/Dashboard';
 import Playlists from '../pages/Playlists';
 import Configuration from '../pages/Configuration';
 import Search from '../pages/CreatePlaylist';
+import Result from '../pages/Result';
 
 const Tabs = createBottomTabNavigator();
 const HomeStack = createStackNavigator();
@@ -34,6 +35,11 @@ const HomeStackScreen = () => (
       name="Search"
       component={Search}
       options={{ title: 'Detalhes da Playlist' }}
+    />
+    <HomeStack.Screen
+      name="Result"
+      component={Result}
+      options={{ title: 'Resultado' }}
     />
   </HomeStack.Navigator>
 );

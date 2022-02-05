@@ -80,8 +80,7 @@ const Playlist: React.FC<Props> = ({ navigation }: Props) => {
         {!loading && playlists && (
           <SafeAreaViewContainer>
             <MsgText>
-              Você pode adicionar novas músicas a uma playlist já criada
-              selecionando-a abaixo.
+              Selecione uma playlist abaixo para adicionar novas músicas.
             </MsgText>
             <FlatList
               data={playlists}
