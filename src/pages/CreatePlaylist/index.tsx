@@ -57,6 +57,7 @@ export default function Search({ route, navigation }: Props) {
   const { data } = route.params;
 
   const [loading, setLoading] = useState(false);
+  const [editPlaylist, setEditPlaylist] = useState(false);
   const [creatingPlaylist, setCreatingPlaylist] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [artists, setArtists] = useState([]);
@@ -132,9 +133,11 @@ export default function Search({ route, navigation }: Props) {
         (element) => element.id !== artist.id
       );
       setSelectedArtists(arrayWithoutElment);
+      Alert.alert('Sucesso', `${artist.name} removido da playlist`);
       return;
     }
     setSelectedArtists([...selectedArtists, artist]);
+    Alert.alert('Sucesso', `${artist.name} adicionado na playlist`);
   };
 
   const openCloseModal = () => {
@@ -203,6 +206,10 @@ export default function Search({ route, navigation }: Props) {
     setArtists(data.artists);
     setGenre(data.genre);
 
+    if (data.playlist.data.id) {
+      setEditPlaylist(true);
+    }
+
     if (data.artists.length > 0) {
       handleArtists();
     }
@@ -219,7 +226,7 @@ export default function Search({ route, navigation }: Props) {
           Selecionar Artistas
         </Button>
         <MsgText>
-          Confirme as informações da playlist que será criada abaixo.
+          Confirme as informações da playlist que será criada/editada abaixo.
         </MsgText>
       </>
       <PlaylistInfoContainer>
@@ -266,8 +273,10 @@ export default function Search({ route, navigation }: Props) {
         )}
       </PlaylistInfoContainer>
       <ButtonSubmit disabled={creatingPlaylist} onPress={handleSubmit}>
-        Criar Playlist
+        {editPlaylist ? 'Editar Playlist' : 'Criar Playlist'}
       </ButtonSubmit>
+      {creatingPlaylist && <Loading title="Criando playlist..." />}
+
       <BannerAd
         unitId={TestIds.BANNER}
         size={BannerAdSize.SMART_BANNER}
@@ -281,7 +290,6 @@ export default function Search({ route, navigation }: Props) {
           console.error('Advert failed to load: ', error);
         }}
       />
-      {creatingPlaylist && <Loading title="Criando playlist..." />}
 
       <Modal
         animationType="slide"

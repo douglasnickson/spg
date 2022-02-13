@@ -8,7 +8,7 @@ export const Container = styled.View`
   flex: 1;
   background-color: #272727;
   align-items: center;
-  padding: 12px;
+  padding: 60px;
   justify-content: flex-start;
   flex-direction: column;
 `;

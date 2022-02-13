@@ -64,7 +64,7 @@ const Dashboard: React.FC<Props> = ({ navigation }: Props) => {
   const [playlist, setPlaylist] = useState<IPlaylist | null>(null);
   const [genres, setGenres] = useState<string[]>([]);
 
-  const { currentPlaylist } = useAuth();
+  const { currentPlaylist, handlePlaylist } = useAuth();
 
   const handleCategory = (value: any) => {
     if (value) {
@@ -112,6 +112,7 @@ const Dashboard: React.FC<Props> = ({ navigation }: Props) => {
     setIsPublic(true);
     setGenre('unknown');
     setPlaylist(null);
+    handlePlaylist(null);
   };
 
   const handleSubmit = () => {
@@ -166,6 +167,8 @@ const Dashboard: React.FC<Props> = ({ navigation }: Props) => {
 
     if (currentPlaylist) {
       setPlaylist(currentPlaylist);
+      setTitle(currentPlaylist.data.name);
+      setDescription(currentPlaylist.data.description);
     }
 
     if (category === 'genre') {
@@ -174,7 +177,7 @@ const Dashboard: React.FC<Props> = ({ navigation }: Props) => {
   }, [currentPlaylist, category]);
 
   return (
-    <ScrollView style={styles.scrollViewStyle}>
+    <ScrollView>
       <Container>
         <Modal
           animationType="slide"
@@ -193,17 +196,6 @@ const Dashboard: React.FC<Props> = ({ navigation }: Props) => {
           </Container>
         </Modal>
         <Image source={logo} />
-
-        {playlist && (
-          <TextInputContainer>
-            <CustomTextInput
-              onChangeText={setTitle}
-              value={'Playlist: ' + playlist.data.name}
-              editable={false}
-              style={styles.placeholderStyle}
-            />
-          </TextInputContainer>
-        )}
         {showCategory && (
           <>
             <PickerContainer>
@@ -266,6 +258,7 @@ const Dashboard: React.FC<Props> = ({ navigation }: Props) => {
           <CustomTextInput
             onChangeText={setTitle}
             value={title}
+            editable={!playlist}
             placeholder="Qual o nome da playlist?"
           />
         </TextInputContainer>
@@ -273,7 +266,8 @@ const Dashboard: React.FC<Props> = ({ navigation }: Props) => {
           <CustomTextInput
             onChangeText={setDescription}
             value={description}
-            placeholder="Descreva a playlist"
+            editable={!playlist}
+            placeholder="Qual a descrição da playlist?"
           />
         </TextInputContainer>
         <TextInputContainer>
@@ -292,6 +286,7 @@ const Dashboard: React.FC<Props> = ({ navigation }: Props) => {
             thumbColor={isPublic ? '#1ed760' : '#f4f3f4'}
             ios_backgroundColor="#3e3e3e"
             onValueChange={handlePublic}
+            disabled={playlist ? true : false}
             value={isPublic}
           />
         </SwitchContainer>
@@ -302,6 +297,7 @@ const Dashboard: React.FC<Props> = ({ navigation }: Props) => {
             thumbColor={collaborative ? '#1ed760' : '#f4f3f4'}
             ios_backgroundColor="#3e3e3e"
             onValueChange={handleCollaborative}
+            disabled={playlist ? true : false}
             value={collaborative}
           />
         </SwitchContainer>
@@ -333,11 +329,6 @@ const Dashboard: React.FC<Props> = ({ navigation }: Props) => {
 };
 
 const styles = StyleSheet.create({
-  scrollViewStyle: {
-    marginBottom: 50,
-    backgroundColor: '#272727',
-  },
-
   btListArtist: {
     marginTop: 8,
     marginEnd: 5,

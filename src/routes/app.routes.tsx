@@ -97,6 +97,7 @@ const AppRoutes: React.FC = () => (
           height: 50,
           paddingHorizontal: 5,
           paddingTop: 0,
+          paddingBottom: 5,
           backgroundColor: '#272727',
           position: 'absolute',
           borderTopWidth: 0,

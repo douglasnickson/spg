@@ -6,12 +6,17 @@ import { Container, Image, BtReset, Message } from './styles';
 import success from '../../assets/success.png';
 import Button from '../../components/Button';
 
+import { useAuth } from '../../contexts/auth';
+
 type Props = {
   navigation: any;
 };
 
 export default function Result({ navigation }: Props) {
+  const { handlePlaylist } = useAuth();
+
   const handleDashboard = () => {
+    handlePlaylist(null);
     navigation.navigate('Criar Playlist');
   };
 

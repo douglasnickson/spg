@@ -59,8 +59,8 @@ const Playlist: React.FC<Props> = ({ navigation }: Props) => {
   );
 
   const goToHome = (item: IPlaylist) => {
-    const { id, name } = item;
-    handlePlaylist({ data: { id, name } });
+    const { id, name, description } = item;
+    handlePlaylist({ data: { id, name, description } });
     navigation.navigate('HomeTab');
   };
 
@@ -88,6 +88,7 @@ const Playlist: React.FC<Props> = ({ navigation }: Props) => {
               renderItem={renderItem}
               keyExtractor={(item) => item.id}
             />
+            {loading && <Loading title="Buscando playlists..." />}
             <BannerAd
               unitId={TestIds.BANNER}
               size={BannerAdSize.SMART_BANNER}
@@ -103,7 +104,6 @@ const Playlist: React.FC<Props> = ({ navigation }: Props) => {
             />
           </SafeAreaViewContainer>
         )}
-        {loading && <Loading title="Buscando playlists..." />}
       </Container>
     </>
   );

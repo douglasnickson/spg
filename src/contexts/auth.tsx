@@ -21,6 +21,7 @@ interface IPlaylist {
   data: {
     id: string;
     name: string;
+    description: string;
   };
 }
 
