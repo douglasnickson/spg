@@ -70,11 +70,12 @@ export default function Search({ route, navigation }: Props) {
       description: data.description,
       public: data.isPublic,
       collaborative: data.collaborative,
+      playlistId: data.playlist.data.id,
     };
 
     if (selectedArtists.length === 0) {
       Alert.alert(
-        'Ops!',
+        'Erro',
         'Você deve selecionar pelo menos um artista para criar a playlist'
       );
       return;
@@ -101,7 +102,13 @@ export default function Search({ route, navigation }: Props) {
       const randomTracks = getRandomItems(tracksIds, data.totalMusics);
       const tracksFormatted = parseTracksWithUri(randomTracks);
 
-      const playlistId = await createPlaylist(playlistInfo, userProfile.id);
+      let playlistId;
+      if (playlistInfo.playlistId) {
+        playlistId = playlistInfo.playlistId;
+      } else {
+        playlistId = await createPlaylist(playlistInfo, userProfile.id);
+      }
+
       if (!playlistId) {
         Alert.alert('Erro', 'Não foi possível criar a playlist');
         return;
@@ -111,7 +118,7 @@ export default function Search({ route, navigation }: Props) {
       setCreatingPlaylist(false);
       navigation.navigate('Result');
     } catch (err) {
-      Alert.alert('Ops', 'Não foi possível criar a playlist');
+      Alert.alert('Erro', 'Não foi possível criar a playlist');
       setCreatingPlaylist(false);
     }
   };

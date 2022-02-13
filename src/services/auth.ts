@@ -39,6 +39,19 @@ export async function authorization(): Promise<IAccessToken | undefined> {
     ],
   };
 
+  authorize(config)
+    .then((response) => {
+      const { accessToken, accessTokenExpirationDate, refreshToken } = response;
+      return {
+        accessToken,
+        expirationDate: accessTokenExpirationDate,
+        refreshToken,
+      };
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+
   try {
     const response = await authorize(config);
     const { accessToken, accessTokenExpirationDate, refreshToken } = response;

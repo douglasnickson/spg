@@ -6068,10 +6068,10 @@ react-is@^17.0.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
-react-native-app-auth@^6.2.0:
-  version "6.4.1"
-  resolved "https://registry.yarnpkg.com/react-native-app-auth/-/react-native-app-auth-6.4.1.tgz#deffdf02c1fb97f78fddcb7abb26494823548fa9"
-  integrity sha512-tsgHQ76F908x8DTe3nq3zB221TdKtd4dgu+vQvEYJbPBZvrr5pM4jwZSdXv/q2OSn1vaPc9R9naOajgVht7N7Q==
+react-native-app-auth@^6.4.2:
+  version "6.4.2"
+  resolved "https://registry.yarnpkg.com/react-native-app-auth/-/react-native-app-auth-6.4.2.tgz#15d4ffdce8504b27410a297e39f9f9cbaaa628bd"
+  integrity sha512-GMZol6Z9Jq3rHMOOLHqS8yGV5S5hRTyTh5dSWNghY/XKoU0QB0AMVRP7kBFoOWiN11DxfNYk1yfTbBzxIkqCGg==
   dependencies:
     invariant "2.2.4"
     react-native-base64 "0.0.2"

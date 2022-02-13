@@ -88,9 +88,7 @@ export const AuthProvider: React.FC = ({ children }) => {
       return setToken(response);
     }
     setLoading(false);
-    Alert.alert(
-      'Ocorreu um erro ao autorizar o aplicativo. Por favor, tente novamente.'
-    );
+    Alert.alert('Erro', 'Ocorreu um erro ao autorizar o aplicativo.');
   }
 
   function signOut() {
