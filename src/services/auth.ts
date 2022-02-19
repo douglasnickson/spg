@@ -21,8 +21,8 @@ export async function authorization(): Promise<IAccessToken | undefined> {
       authorizationEndpoint: 'https://accounts.spotify.com/authorize',
       tokenEndpoint: 'https://accounts.spotify.com/api/token',
     },
-    clientId: 'f2088127db604e0086b00450e8d0197b',
-    clientSecret: 'c05b37737231499485a9b8974cae2ed2',
+    clientId: '5e70949728d140b18018b67173173645',
+    clientSecret: '94b39cb6a92244a98ecba8c292fef75c',
     redirectUrl: 'com.generator.playlist.spotify.app://callback',
     scopes: [
       'user-modify-playback-state',

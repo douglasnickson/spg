@@ -49,6 +49,10 @@ interface Props {
   navigation: any;
 }
 
+const adUnitId = __DEV__
+  ? TestIds.BANNER
+  : 'ca-app-pub-1209664770627704/8754101182';
+
 const Dashboard: React.FC<Props> = ({ navigation }: Props) => {
   const [showCategory, setShowCategory] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -311,7 +315,7 @@ const Dashboard: React.FC<Props> = ({ navigation }: Props) => {
         <Button onPress={handleSubmit}>Próximo</Button>
         <BtReset onPress={handleReset}>Reiniciar</BtReset>
         <BannerAd
-          unitId={TestIds.BANNER}
+          unitId={adUnitId}
           size={BannerAdSize.SMART_BANNER}
           requestOptions={{
             requestNonPersonalizedAdsOnly: true,

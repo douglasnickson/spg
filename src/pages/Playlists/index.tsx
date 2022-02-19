@@ -21,6 +21,10 @@ import { getPlaylists, getUserProfile } from '../../services/spotify';
 
 import imageNotFound from '../../assets/image-not-found.jpg';
 
+const adUnitId = __DEV__
+  ? TestIds.BANNER
+  : 'ca-app-pub-1209664770627704/3842681120';
+
 interface IFlatlistRender {
   item: IPlaylist;
   onPress(data: IPlaylist): void;
@@ -90,7 +94,7 @@ const Playlist: React.FC<Props> = ({ navigation }: Props) => {
             />
             {loading && <Loading title="Buscando playlists..." />}
             <BannerAd
-              unitId={TestIds.BANNER}
+              unitId={adUnitId}
               size={BannerAdSize.SMART_BANNER}
               requestOptions={{
                 requestNonPersonalizedAdsOnly: true,

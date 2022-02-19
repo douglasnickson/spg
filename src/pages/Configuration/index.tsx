@@ -17,9 +17,20 @@ import { IUserProfile } from 'src/model/IUserProfile';
 
 import Loading from '../../components/Loading';
 
+import { useAuth } from '../../contexts/auth';
+
+const adUnitId = __DEV__
+  ? TestIds.BANNER
+  : 'ca-app-pub-1209664770627704/7590354447';
+
 const Configuration: React.FC = () => {
+  const { signOut } = useAuth();
   const [userProfile, setUserProfile] = useState<IUserProfile>();
   const [loading, setLoading] = useState(false);
+
+  const handleLogout = () => {
+    signOut();
+  };
 
   useEffect(() => {
     const getUser = async () => {
@@ -49,9 +60,10 @@ const Configuration: React.FC = () => {
             <ProfileInfo>Tipo: {userProfile.type}</ProfileInfo>
           </InfoContainer>
           <Button>Remover Anúncios</Button>
-          <ButtonLogout>Sair do Aplicativo</ButtonLogout>
+          <ButtonLogout onPress={handleLogout}>Sair do Aplicativo</ButtonLogout>
+          {loading && <Loading />}
           <BannerAd
-            unitId={TestIds.BANNER}
+            unitId={adUnitId}
             size={BannerAdSize.SMART_BANNER}
             requestOptions={{
               requestNonPersonalizedAdsOnly: true,
@@ -65,7 +77,6 @@ const Configuration: React.FC = () => {
           />
         </>
       )}
-      {loading && <Loading />}
     </Container>
   );
 };

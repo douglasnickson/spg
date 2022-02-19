@@ -43,6 +43,10 @@ import Loading from '../../components/Loading';
 import Button from '../../components/Button';
 import imageNotFound from '../../assets/image-not-found.jpg';
 
+const adUnitId = __DEV__
+  ? TestIds.BANNER
+  : 'ca-app-pub-1209664770627704/7569123392';
+
 type IArtistRender = {
   item: IArtist;
   onPress(data: IArtist): void;
@@ -117,6 +121,7 @@ export default function Search({ route, navigation }: Props) {
 
       await addTracksToPlaylist(tracksFormatted, playlistId);
       setCreatingPlaylist(false);
+      console.log('Playlist criada com sucesso');
       navigation.navigate('Result');
     } catch (err) {
       Alert.alert('Erro', 'Não foi possível criar a playlist');
@@ -278,7 +283,7 @@ export default function Search({ route, navigation }: Props) {
       {creatingPlaylist && <Loading title="Criando playlist..." />}
 
       <BannerAd
-        unitId={TestIds.BANNER}
+        unitId={adUnitId}
         size={BannerAdSize.SMART_BANNER}
         requestOptions={{
           requestNonPersonalizedAdsOnly: true,

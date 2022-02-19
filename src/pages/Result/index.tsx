@@ -1,12 +1,16 @@
 import React from 'react';
 import { Alert, Linking } from 'react-native';
-
+import { TestIds, BannerAd, BannerAdSize } from '@react-native-firebase/admob';
 import { Container, Image, BtReset, Message } from './styles';
 
 import success from '../../assets/success.png';
 import Button from '../../components/Button';
 
 import { useAuth } from '../../contexts/auth';
+
+const adUnitId = __DEV__
+  ? TestIds.BANNER
+  : 'ca-app-pub-1209664770627704/9019481026';
 
 type Props = {
   navigation: any;
@@ -41,6 +45,19 @@ export default function Result({ navigation }: Props) {
 
       <Button onPress={handleSpotify}>Abrir Spotify</Button>
       <BtReset onPress={handleDashboard}>Nova Playlist</BtReset>
+      <BannerAd
+        unitId={adUnitId}
+        size={BannerAdSize.SMART_BANNER}
+        requestOptions={{
+          requestNonPersonalizedAdsOnly: true,
+        }}
+        onAdLoaded={() => {
+          console.log('Advert loaded');
+        }}
+        onAdFailedToLoad={(error) => {
+          console.error('Advert failed to load: ', error);
+        }}
+      />
     </Container>
   );
 }
