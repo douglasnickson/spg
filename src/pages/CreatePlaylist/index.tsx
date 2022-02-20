@@ -70,24 +70,24 @@ export default function Search({ route, navigation }: Props) {
   const [selectedArtists, setSelectedArtists] = useState<IArtist[]>([]);
 
   const handleSubmit = async () => {
-    const playlistInfo = {
-      name: data.title,
-      description: data.description,
-      public: data.isPublic,
-      collaborative: data.collaborative,
-      playlistId: data.playlist.data.id,
-    };
-
-    if (selectedArtists.length === 0) {
-      Alert.alert(
-        'Erro',
-        'Você deve selecionar pelo menos um artista para criar a playlist'
-      );
-      return;
-    }
-
-    setCreatingPlaylist(true);
     try {
+      const playlistInfo = {
+        name: data.title,
+        description: data.description,
+        public: data.isPublic,
+        collaborative: data.collaborative,
+        playlistId: data.playlist ? data.playlist.data.id : '',
+      };
+
+      if (selectedArtists.length === 0) {
+        Alert.alert(
+          'Erro',
+          'Você deve selecionar pelo menos um artista para criar a playlist'
+        );
+        return;
+      }
+
+      setCreatingPlaylist(true);
       const userProfile = await getUserProfile();
 
       const artistsIds = selectedArtists.map((artist) => artist.id);
@@ -124,7 +124,7 @@ export default function Search({ route, navigation }: Props) {
       console.log('Playlist criada com sucesso');
       navigation.navigate('Result');
     } catch (err) {
-      Alert.alert('Erro', 'Não foi possível criar a playlist');
+      Alert.alert('Erro', 'Ocorreu um erro durante a criação da playlist.');
       setCreatingPlaylist(false);
     }
   };
@@ -182,43 +182,49 @@ export default function Search({ route, navigation }: Props) {
 
       const result = [] as IArtist[];
 
-      if (data.category === 'artist') {
-        for (const artist of artists) {
-          const response = await getArtists(artist);
-          result.push(...response);
+      try {
+        if (data.category === 'artist') {
+          console.log('Buscando artistas...');
+          for (const artist of artists) {
+            const response = await getArtists(artist);
+            result.push(...response);
+          }
+
+          const artistsOrdered = result
+            .filter((artist) => artist.images[0])
+            .sort((a, b) => {
+              return b.popularity - a.popularity;
+            });
+
+          setArtistList([...artistsOrdered]);
+        } else {
+          console.log('Buscando artistas por gênero...');
+          const response = await getArtistsByGenre(genre);
+          const artistsFiltered = response
+            .filter((artist) => artist.images[0])
+            .sort((a, b) => {
+              return b.popularity - a.popularity;
+            });
+          setArtistList([...artistsFiltered]);
         }
-
-        const artistsOrdered = result
-          .filter((artist) => artist.images[0])
-          .sort((a, b) => {
-            return b.popularity - a.popularity;
-          });
-
-        setArtistList([...artistsOrdered]);
-      } else {
-        const response = await getArtistsByGenre(genre);
-        const artistsFiltered = response
-          .filter((artist) => artist.images[0])
-          .sort((a, b) => {
-            return b.popularity - a.popularity;
-          });
-        setArtistList([...artistsFiltered]);
+      } catch (err) {
+        Alert.alert('Erro', 'Ocorreu um erro ao buscar os artistas');
       }
-
       setLoading(false);
     };
+
+    console.log(data);
 
     setArtists(data.artists);
     setGenre(data.genre);
 
-    if (data.playlist.data.id) {
+    if (data.playlist && data.playlist.data.id) {
       setEditPlaylist(true);
     }
 
-    if (data.artists.length > 0) {
+    if (data.artists.length > 0 || data.genre) {
       handleArtists();
     }
-    console.log(data);
   }, [data, artists, genre]);
 
   return (
@@ -261,7 +267,7 @@ export default function Search({ route, navigation }: Props) {
           <PlaylistInfoTextBold>Colaborativa: </PlaylistInfoTextBold>
           {data.collaborative ? 'Sim' : 'Não'}
         </PlaylistInfoText>
-        {genre === 'unknown' && (
+        {selectedArtists && (
           <PlaylistInfoText>
             <PlaylistInfoTextBold>Artistas Selecionados: </PlaylistInfoTextBold>
             {selectedArtists.length === 0 && (

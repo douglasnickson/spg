@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, TouchableOpacity, ListRenderItemInfo } from 'react-native';
+import {
+  FlatList,
+  TouchableOpacity,
+  ListRenderItemInfo,
+  Alert,
+} from 'react-native';
 import { TestIds, BannerAd, BannerAdSize } from '@react-native-firebase/admob';
 
 import {
@@ -71,10 +76,18 @@ const Playlist: React.FC<Props> = ({ navigation }: Props) => {
   useEffect(() => {
     const getUserPlaylists = async () => {
       setLoading(true);
-      const user = await getUserProfile();
-      const userPlaylists = await getPlaylists(user.id);
-      setPlaylists(userPlaylists);
-      setLoading(false);
+      try {
+        const user = await getUserProfile();
+        const userPlaylists = await getPlaylists(user.id);
+        setPlaylists(userPlaylists);
+        setLoading(false);
+      } catch (err) {
+        setLoading(false);
+        Alert.alert(
+          'Erro',
+          'Ocorreu um erro ao buscar as playlists do usuário.'
+        );
+      }
     };
     getUserPlaylists();
   }, []);

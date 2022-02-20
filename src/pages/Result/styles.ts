@@ -18,6 +18,7 @@ export const Image = styled.Image`
 
 export const BtReset = styled(Button)`
   background-color: red;
+  margin-bottom: 36px;
 `;
 
 export const Message = styled.Text`

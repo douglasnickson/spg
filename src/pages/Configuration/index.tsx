@@ -18,6 +18,7 @@ import { IUserProfile } from 'src/model/IUserProfile';
 import Loading from '../../components/Loading';
 
 import { useAuth } from '../../contexts/auth';
+import { Alert } from 'react-native';
 
 const adUnitId = __DEV__
   ? TestIds.BANNER
@@ -35,9 +36,14 @@ const Configuration: React.FC = () => {
   useEffect(() => {
     const getUser = async () => {
       setLoading(true);
-      const profile = await getUserProfile();
-      setUserProfile(profile);
-      setLoading(false);
+      try {
+        const profile = await getUserProfile();
+        setUserProfile(profile);
+        setLoading(false);
+      } catch (err) {
+        Alert.alert('Erro', 'Ocorreu um erro ao buscar o perfil do usuário.');
+        setLoading(false);
+      }
     };
     getUser();
   }, []);
@@ -62,6 +68,24 @@ const Configuration: React.FC = () => {
           <Button>Remover Anúncios</Button>
           <ButtonLogout onPress={handleLogout}>Sair do Aplicativo</ButtonLogout>
           {loading && <Loading />}
+          <BannerAd
+            unitId={adUnitId}
+            size={BannerAdSize.SMART_BANNER}
+            requestOptions={{
+              requestNonPersonalizedAdsOnly: true,
+            }}
+            onAdLoaded={() => {
+              console.log('Advert loaded');
+            }}
+            onAdFailedToLoad={(error) => {
+              console.error('Advert failed to load: ', error);
+            }}
+          />
+        </>
+      )}
+      {!loading && !userProfile && (
+        <>
+          <ButtonLogout onPress={handleLogout}>Sair do Aplicativo</ButtonLogout>
           <BannerAd
             unitId={adUnitId}
             size={BannerAdSize.SMART_BANNER}
