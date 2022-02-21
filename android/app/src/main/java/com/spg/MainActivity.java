@@ -1,4 +1,4 @@
-package com.spg;
+package com.spotify.playlist.generator.app;
 
 import com.facebook.react.ReactActivity;
 
