@@ -1,6 +1,6 @@
 import { authorize } from 'react-native-app-auth';
 import api from '../services/api';
-
+import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URL, AUTH_BASIC } from '@env';
 interface IAccessToken {
   accessToken: string;
   expirationDate: string;
@@ -16,14 +16,15 @@ interface INewAccessToken {
 }
 
 export async function authorization(): Promise<IAccessToken | undefined> {
+  console.log(CLIENT_ID);
   const config = {
     serviceConfiguration: {
       authorizationEndpoint: 'https://accounts.spotify.com/authorize',
       tokenEndpoint: 'https://accounts.spotify.com/api/token',
     },
-    clientId: '5e70949728d140b18018b67173173645',
-    clientSecret: '94b39cb6a92244a98ecba8c292fef75c',
-    redirectUrl: 'com.generator.playlist.spotify.app://callback',
+    clientId: CLIENT_ID,
+    clientSecret: CLIENT_SECRET,
+    redirectUrl: REDIRECT_URL,
     scopes: [
       'user-modify-playback-state',
       'user-read-currently-playing',
@@ -73,13 +74,14 @@ export async function handleNewAccessToken(
   const params = new URLSearchParams();
   params.append('grant_type', 'refresh_token');
   params.append('refresh_token', refreshToken);
-  params.append('client_id', 'f2088127db604e0086b00450e8d0197b');
+  params.append('client_id', CLIENT_ID);
+
+  console.log(CLIENT_ID, AUTH_BASIC);
 
   const headers = {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization:
-        'Basic ZjIwODgxMjdkYjYwNGUwMDg2YjAwNDUwZThkMDE5N2I6YzA1YjM3NzM3MjMxNDk5NDg1YTliODk3NGNhZTJlZDI=',
+      Authorization: AUTH_BASIC,
     },
   };
 

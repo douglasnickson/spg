@@ -63,7 +63,6 @@ export const AuthProvider: React.FC = ({ children }) => {
         const lastValidTime = addHours(parseISO(expirationDate), 1);
 
         setToken({ accessToken, refreshToken, expirationDate });
-        console.log(token);
         if (isAfter(currentTime, lastValidTime)) {
           console.log('refresh token');
           handleAccessTokenWithRefreshToken(refreshToken);
